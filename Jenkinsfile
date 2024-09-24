@@ -1,81 +1,51 @@
 pipeline {
     agent any
 
-    tools {
-        dockerTool 'Default'
-    }
-
     environment {
-        PATH = "/usr/local/bin:$PATH"
+        DOCKER = '/usr/local/bin/docker'  // Set the absolute path to docker
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
-        // Use credentials to inject Docker Hub username and password
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/MAXBASH/devops-nodejs-app.git'
-            }
-        }
-
         stage('Diagnostic') {
             steps {
                 sh 'echo "User: $(whoami)"'
                 sh 'echo "PATH: $PATH"'
                 sh 'which docker || echo "Docker not found in PATH"'
-                sh 'docker --version || echo "Docker command failed"'
+                sh '$DOCKER --version'
             }
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
-                sh '/usr/local/bin/docker version'
-                sh '/usr/local/bin/docker build -t $DOCKER_IMAGE .'
+                sh '$DOCKER build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'docker run --rm $DOCKER_IMAGE npm test'
+                sh '$DOCKER run --rm $DOCKER_IMAGE npm test'
             }
         }
 
         stage('Push to Registry') {
             steps {
-                // Login to Docker Hub using credentials
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-
-                // Push Docker image
-                sh 'docker push $DOCKER_IMAGE'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | $DOCKER login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh '$DOCKER push $DOCKER_IMAGE'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy the Docker container
-                sh 'docker run -d -p 3000:3000 --name devops-nodejs-app $DOCKER_IMAGE'
+                sh '$DOCKER run -d -p 3000:3000 --name devops-nodejs-app $DOCKER_IMAGE'
             }
         }
     }
 
     post {
         always {
-            script {
-                try {
-                    // Clean up Docker images and containers to save space
-                    sh 'docker system prune -f'
-                } catch (err) {
-                    echo "Docker prune failed: ${err}"
-                }
-            }
+            sh '$DOCKER system prune -f'
         }
     }
 }
