@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER = '/usr/local/bin/docker'  // Set the absolute path to docker
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
