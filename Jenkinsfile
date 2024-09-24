@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         // Use credentials to inject Docker Hub username and password
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
@@ -22,8 +23,8 @@ pipeline {
                 }
             }
             steps {
-                sh 'docker version'
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh '/usr/local/bin/docker version'
+                sh '/usr/local/bin/docker build -t $DOCKER_IMAGE .'
             }
         }
 
