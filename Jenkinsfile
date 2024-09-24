@@ -6,16 +6,26 @@ pipeline {
     }
 
     environment {
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        PATH = "/usr/local/bin:$PATH"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         // Use credentials to inject Docker Hub username and password
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/MAXBASH/devops-nodejs-app.git'
+            }
+        }
+
+        stage('Diagnostic') {
+            steps {
+                sh 'echo "User: $(whoami)"'
+                sh 'echo "PATH: $PATH"'
+                sh 'which docker || echo "Docker not found in PATH"'
+                sh 'docker --version || echo "Docker command failed"'
             }
         }
 
