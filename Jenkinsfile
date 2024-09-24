@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+            docker 'Default'
+    }
+
     environment {
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
