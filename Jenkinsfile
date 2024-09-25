@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/opt/homebrew/opt/openjdk@11'
+        JAVA_HOME = '/opt/homebrew/opt/openjdk@17'
         // PATH = "/usr/local/bin:$PATH"
         PATH = "${JAVA_HOME}/bin:/usr/local/bin:$PATH"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
