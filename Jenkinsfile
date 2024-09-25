@@ -8,13 +8,6 @@ pipeline {
 
     stages {
         stage('Diagnostic') {
-            steps {
-                sh 'echo "User: $(whoami)"'
-                sh 'echo "PATH: $PATH"'
-                sh 'which docker || echo "Docker not found in PATH"'
-                sh '$DOCKER --version'
-            }
-        }
 
         stage('Build') {
             steps {
