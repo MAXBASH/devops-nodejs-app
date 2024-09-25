@@ -5,6 +5,9 @@ pipeline {
         PATH = "/usr/local/bin:$PATH"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        SONARQUBE_SCANNER = tool 'SonarQube-Scanner'  // Reference SonarQube Scanner
+        SONAR_HOST_URL = 'http://localhost:9000'      // SonarQube server URL
+        SONAR_LOGIN = credentials('sonarqube-token') 
     }
 
     stages {
@@ -32,6 +35,20 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'docker run --rm $DOCKER_IMAGE npm test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // Use SonarQube Server
+                    sh '''
+                    $SONARQUBE_SCANNER/bin/sonar-scanner \
+                      -Dsonar.projectKey=devops-nodejs-app \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.login=$SONAR_LOGIN
+                    '''
+                }
             }
         }
 
