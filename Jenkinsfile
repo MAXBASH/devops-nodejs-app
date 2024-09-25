@@ -8,7 +8,27 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/MAXBASH/devops-nodejs-app.git'
+            }
+        }
+
+        stage('Check Docker') {
+            steps {
+                sh 'which docker'
+                sh 'docker --version'
+                sh 'docker ps'
+            }
+        }
+
         stage('Build') {
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
