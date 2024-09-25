@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/local/bin:$PATH"
+        JAVA_HOME = '/opt/homebrew/opt/openjdk@11'
+        // PATH = "/usr/local/bin:$PATH"
+        PATH = "${JAVA_HOME}/bin:/usr/local/bin:$PATH"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         SONARQUBE_SCANNER = tool 'SonarQube-Scanner'  // Reference SonarQube Scanner
