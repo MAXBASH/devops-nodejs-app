@@ -10,33 +10,33 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '$DOCKER build -t $DOCKER_IMAGE .'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Test') {
             steps {
-                sh '$DOCKER run --rm $DOCKER_IMAGE npm test'
+                sh 'docker run --rm $DOCKER_IMAGE npm test'
             }
         }
 
         stage('Push to Registry') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | $DOCKER login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh '$DOCKER push $DOCKER_IMAGE'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push $DOCKER_IMAGE'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '$DOCKER run -d -p 3000:3000 --name devops-nodejs-app $DOCKER_IMAGE'
+                sh 'docker run -d -p 3000:3000 --name devops-nodejs-app $DOCKER_IMAGE'
             }
         }
     }
 
     post {
         always {
-            sh '$DOCKER system prune -f'
+            sh 'docker system prune -f'
         }
     }
 }
