@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/usr/local/bin:$PATH"
         DOCKER_IMAGE = "manoz3896/devops-nodejs-app:${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
@@ -23,12 +24,6 @@ pipeline {
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
